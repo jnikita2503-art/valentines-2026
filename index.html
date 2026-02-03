@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,7 +29,7 @@ button {
   transition: left 0.3s cubic-bezier(.34,1.56,.64,1), top 0.3s cubic-bezier(.34,1.56,.64,1), transform 0.1s ease;
 }
 
-/* Updated Z-INDEX: NO button is now the highest priority */
+/* NO button is z-index 1000 to stay on top of YES and messages */
 #yes { background: #ff4da6; color: white; left: 50%; transform: translateX(-120%); z-index: 10; box-shadow: 0 0 15px #ff80bf; animation: pulse 1.5s infinite; }
 #no { background: #aaa; color: white; left: 50%; transform: translateX(20%); z-index: 1000; }
 
@@ -56,7 +55,6 @@ button {
 .photo-container { display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
 .user-photo { width: 110px; height: 110px; object-fit: cover; border-radius: 10px; border: 3px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
 
-/* Updated Z-INDEX: Quirky message stays behind NO button */
 .no-message {
   position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
   font-size: 1.2rem; font-weight: 800; color: #b30059;
@@ -130,6 +128,7 @@ noBtn.addEventListener("mouseenter", () => {
   
   noMessageIndex++;
 
+  // HEARTBREAK SCATTERED ACROSS ENTIRE SCREEN
   for (let i = 0; i < 12; i++) {
     spawnReaction("💔");
   }
@@ -188,6 +187,7 @@ function celebrate() {
     </div>
   `;
   
+  // HIGH QUANTITY FALLING FROM TOP
   setInterval(() => {
     for (let i = 0; i < 10; i++) {
       setTimeout(() => fall("🌸"), Math.random() * 800);
