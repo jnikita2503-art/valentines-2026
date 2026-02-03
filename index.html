@@ -1,0 +1,212 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Will You Be My Valentine? 💖</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Pacifico&family=Poppins:wght@400;800&family=Great+Vibes&display=swap" rel="stylesheet">
+
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0; height: 100vh; width: 100vw; overflow: hidden;
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at top, #ffe6f2, #ffcce0);
+  display: flex; justify-content: center; align-items: center;
+}
+
+.container { width: 95%; max-width: 700px; text-align: center; z-index: 10; }
+
+.story { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #8b003f; }
+.quote { font-family: 'Pacifico', cursive; font-size: 1.6rem; color: #ff4da6; margin: 5px 0; }
+.question { font-size: 2.5rem; font-weight: 800; color: #cc0052; margin: 10px 0; }
+.bubu { font-size: 2.5rem; }
+.buttons { margin-top: 20px; position: relative; height: 150px; }
+
+button {
+  font-size: 1.1rem; padding: 10px 25px; border-radius: 30px; border: none;
+  cursor: pointer; position: absolute;
+  transition: left 0.3s cubic-bezier(.34,1.56,.64,1), top 0.3s cubic-bezier(.34,1.56,.64,1), transform 0.1s ease;
+}
+
+/* Updated Z-INDEX: NO button is now the highest priority */
+#yes { background: #ff4da6; color: white; left: 50%; transform: translateX(-120%); z-index: 10; box-shadow: 0 0 15px #ff80bf; animation: pulse 1.5s infinite; }
+#no { background: #aaa; color: white; left: 50%; transform: translateX(20%); z-index: 1000; }
+
+@keyframes pulse { 0% { box-shadow: 0 0 10px #ff80bf; } 50% { box-shadow: 0 0 25px #ff1a8c; } 100% { box-shadow: 0 0 10px #ff80bf; } }
+
+.fall { position: fixed; top: -10vh; pointer-events: none; z-index: 1; } 
+.reaction { position: fixed; pointer-events: none; z-index: 100; }
+
+.celebration-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    border-radius: 20px; padding: 25px;
+    border: 1px solid white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    z-index: 50; position: relative;
+    animation: slideUp 0.8s ease-out;
+}
+
+.yes-title { font-family: 'Great Vibes', cursive; font-size: 3.2rem; color: #ff1a8c; margin: 0; }
+.yes-message { font-family: 'Playfair Display', serif; font-size: 1.1rem; line-height: 1.4; color: #8b003f; margin: 15px 0; }
+.final-wish { font-family: 'Great Vibes', cursive; font-size: 2.2rem; color: #cc0052; margin-top: 15px; }
+
+.photo-container { display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.user-photo { width: 110px; height: 110px; object-fit: cover; border-radius: 10px; border: 3px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+
+/* Updated Z-INDEX: Quirky message stays behind NO button */
+.no-message {
+  position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+  font-size: 1.2rem; font-weight: 800; color: #b30059;
+  background: rgba(255, 214, 232, 0.95); padding: 10px 25px;
+  border-radius: 40px; opacity: 0; z-index: 500;
+  white-space: nowrap; pointer-events: none;
+}
+.pop { animation: popIn 0.3s forwards; }
+
+@keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes popIn { from { opacity: 0; transform: translateX(-50%) scale(0.8); } to { opacity: 1; transform: translateX(-50%) scale(1); } }
+@keyframes load { to { width: 100%; } }
+@keyframes fall { to { transform: translateY(115vh) rotate(360deg); } }
+@keyframes floatUp { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: translateY(-150px) scale(1.5); opacity: 0; } }
+
+.loading { position: fixed; inset: 0; background: #fff0f6; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; color: #cc0052; }
+.bar { width: 200px; height: 8px; background: #ffd6e8; border-radius: 10px; margin-top: 10px; overflow: hidden; }
+.bar-fill { height: 100%; width: 0%; background: #ff4da6; animation: load 2s forwards; }
+</style>
+</head>
+<body>
+
+<div class="container" id="content">
+  <div class="story">After 8+ years, you said</div>
+  <div class="quote">“why should girls have all the fun”</div>
+  <div class="story">Fair enough 😏</div>
+  <div class="question">Will you be my Valentine?</div>
+  <div class="bubu">🐻‍❄️🐼</div>
+  <div class="buttons">
+    <button id="yes">YES 💖</button>
+    <button id="no">NO 🙄</button>
+  </div>
+</div>
+
+<div class="no-message" id="noMessage"></div>
+
+<script>
+const noBtn = document.getElementById("no");
+const yesBtn = document.getElementById("yes");
+const container = document.querySelector(".buttons");
+const noMessage = document.getElementById("noMessage");
+
+let noScale = 1;
+let yesScale = 1;
+let noMessageIndex = 0;
+
+const noMessages = [
+  "Wrong answer 😬", "Try again 🙄", "After 8 years?? 😭", 
+  "I’m judging you now 😐", "Is your mouse broken? 🖱️",
+  "The 'Yes' button is right there... ⬅️", "Think of the memories! 📸",
+  "You're being difficult on purpose now 💀", "Are you sure? Final answer? 🧐",
+  "I'll tell your mom. 📱", "Okay, now you're just showing off 💅",
+  "Don't make me get the puppy eyes out 🐶", "Error 404: 'No' not found 🚫",
+  "I will haunt your dreams with dad jokes 👻", "I'm calling the Valentine's Police 🚔",
+  "Fine. I'm moving to the moon. 🌙", "Last chance before I start crying! 😭"
+];
+
+noBtn.addEventListener("mouseenter", () => {
+  noScale = Math.max(0.4, noScale - 0.05);
+  yesScale += 0.1; 
+  noBtn.style.transform = `translateX(20%) scale(${noScale})`;
+  yesBtn.style.transform = `translateX(-120%) scale(${yesScale})`;
+  
+  moveNo();
+  
+  const msg = noMessages[noMessageIndex] || noMessages[noMessages.length - 1];
+  noMessage.textContent = msg;
+  noMessage.classList.remove("pop");
+  void noMessage.offsetWidth; 
+  noMessage.classList.add("pop");
+  
+  noMessageIndex++;
+
+  for (let i = 0; i < 12; i++) {
+    spawnReaction("💔");
+  }
+});
+
+function moveNo() {
+  const maxX = container.offsetWidth - noBtn.offsetWidth;
+  const maxY = container.offsetHeight - noBtn.offsetHeight;
+  noBtn.style.left = Math.random() * maxX + "px";
+  noBtn.style.top = Math.random() * maxY + "px";
+}
+
+function spawnReaction(emoji) {
+  const r = document.createElement("div");
+  r.className = "reaction";
+  r.innerText = emoji;
+  r.style.left = Math.random() * 95 + "vw";
+  r.style.top = Math.random() * 95 + "vh";
+  r.style.fontSize = (Math.random() * 1.5 + 1) + "rem";
+  r.style.animation = "floatUp 1.2s forwards";
+  document.body.appendChild(r);
+  setTimeout(() => r.remove(), 1200);
+}
+
+yesBtn.addEventListener("click", () => {
+  noMessage.style.display = "none"; 
+  showLoading();
+  setTimeout(() => {
+    const loadingScreen = document.querySelector(".loading");
+    if(loadingScreen) loadingScreen.remove();
+    celebrate();
+  }, 2100);
+});
+
+function showLoading() {
+  const l = document.createElement("div");
+  l.className = "loading";
+  l.innerHTML = `<b>Locking in your answer…</b><div class="bar"><div class="bar-fill"></div></div>`;
+  document.body.appendChild(l);
+}
+
+function celebrate() {
+  document.getElementById("content").innerHTML = `
+    <div class="celebration-card">
+        <div class="yes-title">I Knew It! 💖</div>
+        <div class="yes-message">
+            “Eight years, thousands of laughs, and a lifetime of memories later... <br>
+            and you're still the only person I want to annoy forever.”
+        </div>
+        <div class="photo-container">
+            <img class="user-photo" src="https://i.postimg.cc/ykMG1BW1/IMG-20200829-213035.jpg" alt="Us 1">
+            <img class="user-photo" src="https://i.postimg.cc/2Vstkm3L/20251002-152310.jpg" alt="Us 2">
+            <img class="user-photo" src="https://i.postimg.cc/LqTQ31Df/20251229-133005.jpg" alt="Us 3">
+        </div>
+        <div class="final-wish">Happy Valentine’s Day! ❤️🌎</div>
+    </div>
+  `;
+  
+  setInterval(() => {
+    for (let i = 0; i < 10; i++) {
+      setTimeout(() => fall("🌸"), Math.random() * 800);
+      setTimeout(() => fall("❤️"), Math.random() * 800);
+      setTimeout(() => fall("💖"), Math.random() * 800);
+    }
+  }, 500);
+}
+
+function fall(emoji) {
+  const e = document.createElement("div");
+  e.className = "fall"; 
+  e.innerText = emoji;
+  e.style.left = Math.random() * 100 + "vw";
+  e.style.fontSize = (Math.random() * 1 + 1) + "rem"; 
+  e.style.animation = `fall ${3 + Math.random() * 3}s linear forwards`;
+  document.body.appendChild(e);
+  setTimeout(() => e.remove(), 6000);
+}
+</script>
+</body>
+</html>
